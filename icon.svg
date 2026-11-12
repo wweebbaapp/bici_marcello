@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#0a0a1a"/>
+  <circle cx="140" cy="340" r="72" fill="none" stroke="#4fc3f7" stroke-width="18"/>
+  <circle cx="372" cy="340" r="72" fill="none" stroke="#4fc3f7" stroke-width="18"/>
+  <path d="M140 340 L214 196 L300 340 M214 196 L268 196 L300 340 M214 196 L186 196"
+        fill="none" stroke="#ffc832" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M330 150 L380 150 L392 118" fill="none" stroke="#ff9f43" stroke-width="18" stroke-linecap="round"/>
+  <text x="256" y="458" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif"
+        font-size="46" font-weight="800" fill="#ffffff">VAI MARCELLO</text>
+</svg>

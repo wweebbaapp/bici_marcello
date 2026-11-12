@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a1a" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="description" content="bici_marcello — interval training in bici con video. Vai Marcello!!!" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="stylesheet" href="styles.css" />
+  <title>bici_marcello — Vai Marcello!!!</title>
+</head>
+<body>
+  <div id="app">
+    <header id="topbar">
+      <div class="brand">🚴 bici_marcello</div>
+      <div class="vai-badge">Vai Marcello!!!</div>
+      <div class="top-spacer"></div>
+      <label class="ctl ftp-ctl" title="FTP usato per calcolare i watt target">
+        FTP
+        <input type="number" id="ftpW" min="80" max="600" step="5" value="250" inputmode="numeric" />
+        W
+      </label>
+      <button id="btnAudio" class="btn gray" title="Attiva o disattiva i segnali sonori">🔔 Audio</button>
+    </header>
+
+    <main id="stage">
+      <section id="videoCol">
+        <div id="videoWrap">
+          <div id="videoStage">
+            <video id="video" playsinline controls preload="metadata" hidden></video>
+            <iframe
+              id="embed"
+              title="Video allenamento"
+              allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+              allowfullscreen
+              referrerpolicy="no-referrer-when-downgrade"
+              hidden
+            ></iframe>
+            <div id="placeholder" class="placeholder">
+              <div class="ph-icon">🎬</div>
+              <div class="ph-title">Carica un video o incolla un link</div>
+              <div class="ph-sub">Video locale dal PC, YouTube o RaiPlay</div>
+              <div class="ph-actions">
+                <label class="btn blue">
+                  📂 Scegli video
+                  <input type="file" id="videoInput" accept="video/*" hidden />
+                </label>
+                <button id="btnFocusUrl" class="btn gray" type="button">🔗 Link YouTube / RaiPlay</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="hudOverlay" aria-hidden="true">
+            <div class="hud-row">
+              <div class="hud-panel">
+                <div class="hud-kicker">FASE</div>
+                <div id="hudPhase" class="hud-phase">Pronto</div>
+                <div id="hudMeta" class="hud-meta">Scegli un allenamento</div>
+              </div>
+              <div class="hud-panel hud-right">
+                <div class="hud-kicker">MANCANO</div>
+                <div id="hudRemaining" class="hud-big">--:--</div>
+              </div>
+            </div>
+            <div class="hud-row hud-bottom">
+              <div class="hud-panel hud-targets">
+                <div class="hud-target"><span class="hud-kicker">FTP</span><b id="hudFtp">—</b></div>
+                <div class="hud-target"><span class="hud-kicker">WATT</span><b id="hudWatt">—</b></div>
+                <div class="hud-target"><span class="hud-kicker">RPM</span><b id="hudRpm">—</b></div>
+              </div>
+              <div class="hud-panel hud-right">
+                <div class="hud-kicker">TOTALE</div>
+                <div id="hudTotal" class="hud-total">--:--</div>
+              </div>
+            </div>
+          </div>
+
+          <div id="motivation" class="motivation" aria-live="polite"></div>
+          <div class="watermark">Vai Marcello!!!</div>
+        </div>
+
+        <div id="videoBar">
+          <label class="btn blue small">
+            📂 Video locale
+            <input type="file" id="videoInputBar" accept="video/*" hidden />
+          </label>
+          <div class="url-row">
+            <input type="url" id="videoUrl" placeholder="Incolla link YouTube o RaiPlay…" autocomplete="off" />
+            <button id="btnLoadUrl" class="btn blue small" type="button">Carica</button>
+            <a id="openExternal" class="btn gray small" href="#" target="_blank" rel="noopener" hidden>↗ Apri</a>
+          </div>
+          <span id="videoStatus" class="video-status">Nessun video caricato</span>
+        </div>
+
+        <div id="timelineWrap">
+          <canvas id="timeline"></canvas>
+        </div>
+      </section>
+
+      <aside id="sidePanel">
+        <div class="vai-banner">VAI MARCELLO!!!</div>
+
+        <div class="panel-card current-card">
+          <div id="phaseLabel" class="phase-label">Pronto</div>
+          <div id="phaseMeta" class="phase-meta">Scegli un allenamento e premi Start</div>
+          <div id="currentRemaining" class="current-remaining">--:--</div>
+          <div class="bar"><div id="segmentBar" class="bar-fill"></div></div>
+          <div id="seriesInfo" class="series-info">Serie — · Ripetizione —</div>
+        </div>
+
+        <div class="targets">
+          <div class="target-card ftp"><span>FTP</span><b id="targetFtp">—</b></div>
+          <div class="target-card watt"><span>WATT</span><b id="targetWatt">—</b></div>
+          <div class="target-card rpm"><span>RPM</span><b id="targetRpm">—</b></div>
+        </div>
+
+        <div class="panel-card">
+          <div class="next-title">Prossimo</div>
+          <div id="nextInfo" class="next-info">—</div>
+          <div class="bar total-bar"><div id="totalBar" class="bar-fill"></div></div>
+          <div id="totalTime" class="total-time">0:00 / 0:00</div>
+        </div>
+
+        <div class="panel-card summary-card">
+          <div class="summary-title">Struttura allenamento</div>
+          <div id="summary" class="summary"></div>
+        </div>
+
+        <div class="panel-card motivation-card">
+          <div class="motivation-title">Il coach dice</div>
+          <div id="motivationPanel" class="motivation-text">Pronto a spingere, Marcello?</div>
+        </div>
+      </aside>
+    </main>
+
+    <footer id="controls">
+      <div class="row">
+        <div class="preset-group" role="group" aria-label="Allenamenti preimpostati">
+          <button class="btn preset" data-preset="w30" type="button">⏱ 30 min</button>
+          <button class="btn preset" data-preset="w45" type="button">⏱ 45 min</button>
+          <button class="btn preset" data-preset="w60" type="button">⏱ 1 ora</button>
+          <button class="btn preset" data-preset="custom" type="button">🛠 Personalizzato</button>
+        </div>
+        <div class="spacer"></div>
+        <button id="btnStart" class="btn green btn-main" type="button">▶ Start</button>
+        <button id="btnReset" class="btn gray" type="button">⟲ Reset</button>
+        <button id="btnSkip" class="btn gray" type="button">⏭ Salta fase</button>
+      </div>
+
+      <div id="customForm" class="row custom-form" hidden>
+        <label class="ctl">Ripetizioni/serie
+          <input type="number" id="customReps" min="3" max="12" step="1" value="3" inputmode="numeric" />
+        </label>
+        <label class="ctl">Durata allungo
+          <input type="number" id="customSurge" min="10" max="300" step="5" value="60" inputmode="numeric" />
+          s
+        </label>
+        <label class="ctl">FTP allungo
+          <input type="range" id="customFtp" min="70" max="100" step="1" value="85" />
+          <b id="customFtpVal">85%</b>
+        </label>
+        <span class="hint">Il recupero dentro la serie dura quanto l'allungo.</span>
+        <span id="customTotal" class="custom-total">Totale: —</span>
+      </div>
+
+      <div id="status" class="status">Pronto</div>
+    </footer>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
